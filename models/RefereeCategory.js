@@ -41,6 +41,7 @@ RefereeCategory.init(
     {
         sequelize,
         modelName: 'RefereeCategory',
+        tableName: 'referee_categories'
     }
 );
 

@@ -46,6 +46,8 @@ Test.init(
     {
         sequelize,
         modelName: 'Test',
+        tableName: 'tests',
+
     }
 );
 
