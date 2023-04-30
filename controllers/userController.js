@@ -101,7 +101,22 @@ exports.login = async (req, res) => {
 };
 
 exports.getUser = async (req, res) => {
-    // Implement logic to get a user by ID
+    try {
+        const id = req.params.id;
+
+        const user = await User.findByPk(id, {
+            attributes: ['id', 'email', 'username', 'first_name', 'last_name', 'patronymic', 'role_id']
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
 };
 
 exports.updateUser = async (req, res) => {
