@@ -48,10 +48,26 @@ User.init(
                 key: 'id',
             },
         },
+        created_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: 'created_at'
+        },
+        updated_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: 'updated_at'
+        }
     },
     {
         sequelize,
         modelName: 'User',
+        tableName: 'users',
+        timestamps: true,
+        updatedAt: 'updated_at',
+        createdAt: 'created_at'
     }
 );
 

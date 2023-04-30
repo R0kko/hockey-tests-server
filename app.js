@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+const db = require('./config/database');
+
 dotenv.config();
 
 const app = express();
@@ -26,3 +28,11 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+db.sync()
+    .then(() => {
+        console.log('Database synchronized');
+    })
+    .catch((error) => {
+        console.error('Error synchronizing the database:', error);
+    });
