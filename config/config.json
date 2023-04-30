@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "gen_user",
+    "password": "cr8xzd0tb4",
+    "database": "default_db",
+    "host": "185.124.64.120",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "gen_user",
+    "password": "cr8xzd0tb4",
+    "database": "default_db",
+    "host": "185.124.64.120",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "gen_user",
+    "password": "cr8xzd0tb4",
+    "database": "default_db",
+    "host": "185.124.64.120",
+    "dialect": "postgres"
+  }
+}
