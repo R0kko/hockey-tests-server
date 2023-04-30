@@ -1,7 +1,7 @@
 const RefereeCategory = require('../models/RefereeCategory');
 
 exports.assignCategory = async (req, res) => {
-    // Implement logic to assign a category to a referee
+
 };
 
 exports.getAllRefereeCategories = async (req, res) => {

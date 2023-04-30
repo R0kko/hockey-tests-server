@@ -1,18 +1,26 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
+const {Op} = require("sequelize");
 
 exports.register = async (req, res) => {
     try {
         const { username, email, password, first_name, last_name, patronymic, role_id } = req.body;
 
-        if ( !username || !email || !password || !first_name || !last_name || !role_id) {
+        if (!username || !email || !password || !first_name || !last_name || !role_id) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        const userExists = await User.findOne({ where: { email } });
+        const userExists = await User.findOne({
+            where: {
+                [Op.or]: [
+                    { email },
+                    { username },
+                ],
+            },
+        });
 
         if (userExists) {
-            return res.status(400).json({ message: 'Email already in use' });
+            return res.status(400).json({ message: 'Email or username already in use' });
         }
 
         const salt = await bcrypt.genSalt(10);
