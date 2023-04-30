@@ -65,6 +65,7 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
+        // noinspection JSCheckFunctionSignatures
         const user = await User.findOne({ where: { username } });
 
         if (!user) {
@@ -120,9 +121,56 @@ exports.getUser = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-    // Implement logic to update a user
+    try {
+        const { id } = req.params;
+        const { username, email, first_name, last_name, patronymic, role_id } = req.body;
+
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await user.update({
+            username: username || user.username,
+            email: email || user.email,
+            first_name: first_name || user.first_name,
+            last_name: last_name || user.last_name,
+            patronymic: patronymic || user.patronymic,
+            role_id: role_id || user.role_id
+        });
+
+        res.status(200).json({
+            message: 'User updated successfully',
+            user: {
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                patronymic: user.patronymic,
+                role_id: user.role_id
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
 };
 
 exports.deleteUser = async (req, res) => {
-    // Implement logic to delete a user
+    try {
+        const { id } = req.params;
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await user.destroy();
+        res.status(200).json({ message: 'User deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
 };
