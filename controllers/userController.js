@@ -62,6 +62,7 @@ exports.login = async (req, res) => {
         console.log(username);
 
         if (!username || !password) {
+            console.log("Missing required fields");
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
@@ -69,13 +70,13 @@ exports.login = async (req, res) => {
         const user = await User.findOne({ where: { username } });
 
         if (!user) {
-            return res.status(400).json({ message: 'User not found' });
+            return res.status(400).json({ message: 'Пользователь не найден' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid password' });
+            return res.status(401).json({ message: 'Некорректный пароль' });
         }
 
         const token = jwt.sign({ id: user.id, role_id: user.role_id }, process.env.JWT_SECRET, {
@@ -97,7 +98,7 @@ exports.login = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ message: 'Внутренняя ошибка сервера' });
     }
 };
 

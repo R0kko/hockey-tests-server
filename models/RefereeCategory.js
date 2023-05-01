@@ -37,11 +37,26 @@ RefereeCategory.init(
             type: DataTypes.DATE,
             allowNull: false,
         },
+        created_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: 'created_at'
+        },
+        updated_at: {
+            type: DataTypes.DATE,
+            allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: 'updated_at'
+        }
     },
     {
         sequelize,
         modelName: 'RefereeCategory',
-        tableName: 'referee_categories'
+        tableName: 'referee_categories',
+        timestamps: true,
+        updatedAt: 'updated_at',
+        createdAt: 'created_at'
     }
 );
 
