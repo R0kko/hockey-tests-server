@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes, Model } = require('sequelize');
 const sequelize = require('../config/database');
+const TestType = require("./TestType");
 
 class Test extends Model {}
 
@@ -19,6 +20,14 @@ Test.init(
             allowNull: false,
             references: {
                 model: 'question_categories',
+                key: 'id',
+            },
+        },
+        test_type_id: {
+            type: DataTypes.UUID,
+            allowNull: false,
+            references: {
+                model: 'test_types',
                 key: 'id',
             },
         },
@@ -50,5 +59,8 @@ Test.init(
 
     }
 );
+
+Test.belongsTo(TestType, { foreignKey: 'test_type_id', as: 'testType' });
+TestType.hasMany(Test, { foreignKey: 'test_type_id' });
 
 module.exports = Test;
