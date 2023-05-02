@@ -35,28 +35,26 @@ Test.init(
             type: DataTypes.INTEGER,
             allowNull: false,
         },
-        passing_score: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
-        start_time: {
+        created_at: {
             type: DataTypes.DATE,
             allowNull: false,
+            defaultValue: DataTypes.NOW,
+            field: 'created_at'
         },
-        end_time: {
+        updated_at: {
             type: DataTypes.DATE,
             allowNull: false,
-        },
-        completion_time: {
-            type: DataTypes.DATE,
-            allowNull: true,
-        },
+            defaultValue: DataTypes.NOW,
+            field: 'updated_at'
+        }
     },
     {
         sequelize,
         modelName: 'Test',
         tableName: 'tests',
-
+        timestamps: false,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at'
     }
 );
 
