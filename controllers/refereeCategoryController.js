@@ -1,6 +1,6 @@
-const User = require('../models/User');
-const CategoryName = require('../models/CategoryName');
-const RefereeCategory = require('../models/RefereeCategory');
+const User = require('../models/users');
+const CategoryName = require('../models/category_names');
+const RefereeCategory = require('../models/referee_categories');
 
 exports.assignCategory = async (req, res) => {
     try {
