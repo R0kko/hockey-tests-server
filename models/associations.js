@@ -10,6 +10,7 @@ const Test = require("./tests");
 const UserAnswer = require("./user_answers");
 const UserTest = require("./user_tests");
 const Answer = require("./answers");
+const TestQuestion = require("./test_question");
 
 User.belongsTo(Role, { foreignKey: "role_id" });
 Role.hasMany(User, { foreignKey: "role_id" });
@@ -50,6 +51,9 @@ Question.hasMany(UserAnswer, { foreignKey: "question_id" });
 UserAnswer.belongsTo(Answer, { foreignKey: "answer_id" });
 Answer.hasMany(UserAnswer, { foreignKey: "answer_id" });
 
+Test.belongsToMany(Question, { through: TestQuestion, foreignKey: 'test_id' });
+Question.belongsToMany(Test, { through: TestQuestion, foreignKey: 'question_id' });
+
 module.exports = {
     User,
     Role,
@@ -63,4 +67,5 @@ module.exports = {
     UserAnswer,
     UserTest,
     Answer,
+    TestQuestion
 };

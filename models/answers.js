@@ -23,6 +23,16 @@ const Answer = sequelize.define("Answer", {
     is_correct: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+    },
+    created_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
+    },
+    updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW
     }
 }, {
     tableName: "answers",

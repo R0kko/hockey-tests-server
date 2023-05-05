@@ -19,7 +19,7 @@ const testRoutes = require('./routes/tests');
 const refereeCategoryRoutes = require('./routes/refereeCategories');
 
 app.use('/api/users', userRoutes);
-// app.use('/api/questions', questionRoutes);
+app.use('/api/questions', questionRoutes);
 app.use('/api/tests', testRoutes);
 app.use('/api/referee-categories', refereeCategoryRoutes);
 

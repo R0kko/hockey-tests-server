@@ -1,5 +1,5 @@
 // Import required models and Sequelize instance
-const { UserTest, Test, CategoryName, TestType } = require("../models/associations");
+const { UserTest, Test, CategoryName, TestType, TestQuestion} = require("../models/associations");
 
 exports.getUserTests = async (req, res) => {
     try {
@@ -41,3 +41,31 @@ exports.getUserTests = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
+
+exports.getUserTest = async (req, res) => {
+    try {
+        const UserTestId = req.params.testId;
+        (console.log(UserTestId));
+        if (!UserTestId) {
+            return res.status(400).json({ message: 'Test ID is required' });
+        }
+
+        const test = await UserTest.findOne({ where: { id: UserTestId } });
+        if (!test) {
+            return res.status(404).json({ message: 'Test not found' });
+        }
+
+        (console.log(test.test_id));
+        const testQuestions = await TestQuestion.findAll({ where: { test_id: test.test_id } });
+
+        const questionIds = testQuestions.map(testQuestion => testQuestion.question_id);
+
+        res.status(200).json({
+            test: test,
+            questionIds: questionIds
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred while fetching the test and questions', error: error });
+    }
+};
+
