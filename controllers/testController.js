@@ -61,8 +61,10 @@ exports.getUserTest = async (req, res) => {
         const questionIds = testQuestions.map(testQuestion => testQuestion.question_id);
 
         res.status(200).json({
-            test: test,
-            questionIds: questionIds
+            testId: test.id,
+            status: test.status,
+            questionIds: questionIds,
+            amount: testQuestions.length,
         });
     } catch (error) {
         res.status(500).json({ message: 'An error occurred while fetching the test and questions', error: error });

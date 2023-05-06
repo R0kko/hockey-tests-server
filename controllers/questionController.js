@@ -101,7 +101,7 @@ exports.getQuestion = async (req, res) => {
 
         const answers = await Answer.findAll({
             where: { question_id: questionId },
-            attributes: ['answer_text']
+            attributes: ['id', 'answer_text']
         });
 
         let mediaUrl = null;
@@ -111,9 +111,10 @@ exports.getQuestion = async (req, res) => {
         }
 
         res.status(200).json({
+            id: question.id,
             question_text: question.question_text,
             level_name: question.DifficultyLevel.level_name,
-            answers: answers.map(answer => answer.answer_text),
+            answers: answers.map(answer => ({ id: answer.id, text: answer.answer_text })),
             media_url: mediaUrl
         });
     } catch (error) {
