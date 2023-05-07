@@ -1,4 +1,4 @@
-const {Media, Question, Answer, DifficultyLevel} = require("../models/associations");
+const {Media, Question, Answer, DifficultyLevel, UserAnswer} = require("../models/associations");
 
 exports.createQuestion = async (req, res) => {
     try {
@@ -32,7 +32,7 @@ exports.createQuestion = async (req, res) => {
 
         const createdAnswers = [];
         for (const answerData of answers) {
-            const answer = new Answer({ ...answerData, question_id: question.id });
+            const answer = new Answer({ ...answerData, question_id: question.id});
             await answer.save();
             createdAnswers.push(answer);
         }
@@ -122,3 +122,87 @@ exports.getQuestion = async (req, res) => {
         res.status(500).json({ message: 'An error occurred while fetching the question details' });
     }
 };
+
+exports.answerQuestion = async (req, res) => {
+    try {
+        const usertestId = req.params.userTestId;
+        const questionId = req.params.questionId;
+        const answerId = req.params.answerId;
+
+        if (!usertestId || !questionId || !answerId) {
+            return res.status(400).json({ message: 'User test ID, question ID, and answer ID are required' });
+        }
+
+        const question = await Question.findByPk(questionId);
+        if (!question) {
+            console.log('Question not found');
+            return res.status(404).json({ message: 'Question not found' });
+        }
+
+        const answer = await Answer.findByPk(answerId);
+        if (!answer) {
+            return res.status(404).json({ message: 'Answer not found' });
+        }
+
+        const isCorrect = answer.is_correct;
+
+        // if answer already exists, return the answer
+        const existingAnswer = await UserAnswer.findOne({
+            where: { user_test_id: usertestId, question_id: questionId }
+        });
+        if (existingAnswer) {
+            return res.status(200).json({ isCorrect });
+        }
+
+        // Save the user's answer in the UserAnswer table
+        await UserAnswer.create({
+            user_test_id: usertestId,
+            question_id: questionId,
+            answer_id: answerId,
+            is_correct: isCorrect,
+        });
+
+        res.status(200).json({ isCorrect });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while checking the answer' });
+    }
+};
+
+exports.noQuestionAnswer = async (req, res) => {
+    try {
+        const usertestId = req.params.userTestId;
+        const questionId = req.params.questionId;
+
+        if (!usertestId || !questionId) {
+            return res.status(400).json({ message: 'User test ID, question ID are required' });
+        }
+
+        const question = await Question.findByPk(questionId);
+        if (!question) {
+            console.log('Question not found');
+            return res.status(404).json({ message: 'Question not found' });
+        }
+
+        const isCorrect = false;
+
+        const existingAnswer = await UserAnswer.findOne({
+            where: { user_test_id: usertestId, question_id: questionId }
+        });
+        if (existingAnswer) {
+            return res.status(200).json({ isCorrect });
+        }
+
+        // Save the user's answer in the UserAnswer table
+        await UserAnswer.create({
+            user_test_id: usertestId,
+            question_id: questionId,
+            answer_id: null,
+            is_correct: false,
+        });
+        res.status(200).json({ isCorrect });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'An error occurred while checking the answer' });
+    }
+}

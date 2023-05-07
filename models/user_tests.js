@@ -50,6 +50,14 @@ const UserTest = sequelize.define("UserTest", {
             type: DataTypes.DATE,
             allowNull: false,
         },
+        started_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+        finished_at: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        }
     },
     options = {
         tableName: "user_tests",

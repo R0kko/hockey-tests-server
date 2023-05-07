@@ -71,3 +71,65 @@ exports.getUserTest = async (req, res) => {
     }
 };
 
+exports.startTest = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const userTestId = req.params.userTestId;
+
+        if (!userId || !userTestId) {
+            return res.status(400).json({ message: 'User ID and user test ID are required' });
+        }
+
+        const userTest = await UserTest.findOne({ where: { id: userTestId } });
+        if (!userTest) {
+            return res.status(404).json({ message: 'User test not found' });
+        }
+
+        if (userTest.status === 'Started') {
+            return res.status(200).json({ message: 'Test has already been started' });
+        }
+
+        if (userTest.status === 'Finished') {
+            return res.status(400).json({ message: 'Test has already been started' });
+        }
+
+        await userTest.update({ status: 'Started' });
+        await userTest.update({ started_at: new Date() });
+
+        res.status(200).json({ message: 'Test started' });
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred while starting the test', error: error });
+        console.log(error);
+    }
+}
+
+exports.finishTest = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const userTestId = req.params.userTestId;
+
+        if (!userId || !userTestId) {
+            return res.status(400).json({ message: 'User ID and user test ID are required' });
+        }
+
+        const userTest = await UserTest.findOne({ where: { id: userTestId } });
+        if (!userTest) {
+            return res.status(404).json({ message: 'User test not found' });
+        }
+
+        if (userTest.status !== 'Started') {
+            return res.status(400).json({ message: 'Test has not been started' });
+        }
+
+        if (userTest.status === 'Finished') {
+            return res.status(400).json({ message: 'Test has already been finished' });
+        }
+
+        await userTest.update({ status: 'finished' });
+        await userTest.update({ finished_at: new Date() });
+
+        res.status(200).json({ message: 'Test finished' });
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred while finishing the test', error: error });
+    }
+}
