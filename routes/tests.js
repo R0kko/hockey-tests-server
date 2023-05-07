@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const testController = require('../controllers/testController');
 
+router.get('/test-result/:userId/:userTestId', testController.getTestResult);
+
 router.get('/:id', testController.getUserTests);
 router.get('/:id/:testId', testController.getUserTest);
 
