@@ -151,6 +151,9 @@ exports.answerQuestion = async (req, res) => {
             where: { user_test_id: usertestId, question_id: questionId }
         });
         if (existingAnswer) {
+            if (existingAnswer.answer_id !== answerId) {
+                await existingAnswer.update({ answer_id: answerId, is_correct: isCorrect });
+            }
             return res.status(200).json({ isCorrect });
         }
 

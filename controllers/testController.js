@@ -6,22 +6,28 @@ exports.getUserTests = async (req, res) => {
         const userId = req.params.id;
 
         if (!userId) {
-            return res.status(400).json({message: "Missing user ID"});
+            return res.status(400).json({ message: "Missing user ID" });
         }
 
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0);
+
         const userTests = await UserTest.findAll({
-            where: {user_id: userId},
+            where: {
+                user_id: userId,
+                finished_at: null,
+            },
             include: [
                 {
                     model: Test,
                     include: [
-                        {model: CategoryName, attributes: ["name"]},
-                        {model: TestType, attributes: ["type_name"]},
+                        { model: CategoryName, attributes: ["name"] },
+                        { model: TestType, attributes: ["type_name"] },
                     ],
                     attributes: ["id", "created_at"],
                 },
             ],
-            attributes: ["id"],
+            attributes: ["id", "active_from", "active_to"],
             raw: true,
             nest: true,
         });
@@ -31,14 +37,14 @@ exports.getUserTests = async (req, res) => {
                 user_test_id: userTest.id,
                 category_name: userTest.Test.CategoryName.name,
                 test_type_name: userTest.Test.TestType.type_name,
-                start_date: userTest.Test.created_at,
+                start_date: userTest.active_from,
             };
         });
 
         res.status(200).json(responseData);
     } catch (error) {
         console.error("Error in getUserTests:", error);
-        res.status(500).json({message: "Server error"});
+        res.status(500).json({ message: "Server error" });
     }
 };
 
@@ -55,7 +61,6 @@ exports.getUserTest = async (req, res) => {
             return res.status(404).json({message: 'Test not found'});
         }
 
-        (console.log(test.test_id));
         const testQuestions = await TestQuestion.findAll({where: {test_id: test.test_id}});
 
         const questionIds = testQuestions.map(testQuestion => testQuestion.question_id);
@@ -174,13 +179,16 @@ exports.getTestResult = async (req, res) => {
 
         await userTest.update({score: score});
 
-        // if there are more than 85% correct answers, the test is passed
-
         const testQuestions = await TestQuestion.findAll({where: {test_id: userTest.test_id}});
         const amount = testQuestions.length;
 
-        if (score >= amount * 0.85) {
+        const test = await Test.findOne({where: {id: userTest.test_id}});
+        const testType = test.test_type_id;
+        const testTypeText = await TestType.findOne({where: {id: testType}});
+        if (score >= amount * 0.85 && testTypeText === "Квалификационный зачет") {
             await userTest.update({sertificate: "https://s3.timeweb.com/065de851-fhr-referee-media/Sertificate.pdf"});
+        } else {
+            await userTest.update({sertificate: "null"});
         }
 
         const incorrectAnswers = await UserAnswer.findAll({where: {user_test_id: userTestId, is_correct: false}});
