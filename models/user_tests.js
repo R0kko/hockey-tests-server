@@ -57,6 +57,10 @@ const UserTest = sequelize.define("UserTest", {
         finished_at: {
             type: DataTypes.DATE,
             allowNull: true,
+        },
+        sertificate: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
         }
     },
     options = {

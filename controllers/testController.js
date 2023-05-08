@@ -174,7 +174,14 @@ exports.getTestResult = async (req, res) => {
 
         await userTest.update({score: score});
 
+        // if there are more than 85% correct answers, the test is passed
+
         const testQuestions = await TestQuestion.findAll({where: {test_id: userTest.test_id}});
+        const amount = testQuestions.length;
+
+        if (score >= amount * 0.85) {
+            await userTest.update({sertificate: "https://s3.timeweb.com/065de851-fhr-referee-media/Sertificate.pdf"});
+        }
 
         const incorrectAnswers = await UserAnswer.findAll({where: {user_test_id: userTestId, is_correct: false}});
         const incorrectAnswersIds = incorrectAnswers.map(incorrectAnswer => incorrectAnswer.question_id);
@@ -189,5 +196,41 @@ exports.getTestResult = async (req, res) => {
         });
     } catch (error) {
         res.status(500).json({message: 'An error occurred while fetching the test result', error: error});
+    }
+}
+
+exports.getFinishedTests = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+
+        if (!userId) {
+            return res.status(400).json({message: 'User ID is required'});
+        }
+
+        const userTests = await UserTest.findAll({where: {user_id: userId, status: 'Finished'}});
+        const test = await Test.findOne({where: {id: userTests.map(userTest => userTest.test_id)}});
+
+        const testCategories = await Test.findAll({where: {id: userTests.map(userTest => userTest.test_id)}});
+        const categories = await CategoryName.findAll({where: {id: testCategories.map(testCategory => testCategory.category_id)}});
+
+        const testTypes = await TestType.findAll({where: {id: test.test_type_id}});
+        const testQuestions = await TestQuestion.findAll({where: {test_id: userTests.map(userTest => userTest.test_id)}});
+
+        const responseData = userTests.map(userTest => {
+            return {
+                id: userTest.id,
+                score: userTest.score,
+                amount: testQuestions.filter(testQuestion => testQuestion.test_id === userTest.test_id).length,
+                finished_at: userTest.finished_at,
+                test_type: testTypes.find(testType => testType.id === test.test_type_id).type_name,
+                category: categories.find(category => category.id === test.category_id).name,
+                sertificate: userTest.sertificate ? userTest.sertificate : null,
+            };
+        });
+
+        res.status(200).json(responseData);
+    } catch (error) {
+        console.error("Error in getUserTests:", error);
+        res.status(500).json({message: "Server error"});
     }
 }
